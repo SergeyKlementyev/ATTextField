@@ -273,7 +273,7 @@ open class ATTextField: UITextField {
         alertLeadingConstraint.constant = alertLabelEdge.left
         alertTopConstraint.constant = alertLabelEdge.top
         alertTrailingConstraint.constant = alertLabelEdge.right
-        alertBottomConstraint.constant = alertLabelEdge.right
+        alertBottomConstraint.constant = alertLabelEdge.bottom
         setNeedsLayout()
     }
     
@@ -287,7 +287,7 @@ open class ATTextField: UITextField {
         alertLeadingConstraint = alertLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: alertLabelEdge.left)
         alertTopConstraint = alertLabel.topAnchor.constraint(equalTo: baseLineView.bottomAnchor, constant: alertLabelEdge.top)
         alertTrailingConstraint = trailingAnchor.constraint(equalTo: alertLabel.trailingAnchor, constant: alertLabelEdge.right)
-        alertBottomConstraint = alertLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: alertLabelEdge.bottom)
+        alertBottomConstraint = alertLabel.bottomAnchor.constraint(greaterThanOrEqualTo: bottomAnchor, constant: alertLabelEdge.bottom)
         NSLayoutConstraint.activate([alertLeadingConstraint, alertTopConstraint, alertTrailingConstraint, alertBottomConstraint])
     }
     
@@ -447,5 +447,7 @@ open class ATTextField: UITextField {
     private func updateAlertLabelProperties() {
         alertLabel.textColor = alertColor
         alertLabel.text = alertText
+        invalidateIntrinsicContentSize()
+        updateConstraints()
     }
 }
