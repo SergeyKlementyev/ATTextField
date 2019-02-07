@@ -105,7 +105,7 @@ class ProgViewController: UIViewController {
         layoutTextFields()
     }
 
-    func imageTap(sender: UIGestureRecognizer) {
+    @objc func imageTap(sender: UIGestureRecognizer) {
         print(#function)
     }
     

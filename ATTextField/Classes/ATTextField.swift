@@ -34,10 +34,6 @@ open class ATTextField: UITextField {
     
     private var baselineHeight: CGFloat = 1.0
     
-    private var alertLabelHeight: CGFloat {
-        return alertLabel.intrinsicContentSize.height
-    }
-    
     public private(set) var headLabel: UILabel!
     public private(set) var baseLineView: UIView!
     public private(set) var alertLabel: UILabel!
@@ -98,6 +94,12 @@ open class ATTextField: UITextField {
         }
     }
     
+    @IBInspectable open var alertHeight: CGFloat = 0  {
+        didSet {
+            updateAlertLabelConstraints()
+        }
+    }
+    
     public var headLabelEdge: UIEdgeInsets = .zero {
         didSet {
             updateHeadLabelConstraints()
@@ -135,6 +137,7 @@ open class ATTextField: UITextField {
     private var alertTopConstraint: NSLayoutConstraint!
     private var alertTrailingConstraint: NSLayoutConstraint!
     private var alertBottomConstraint: NSLayoutConstraint!
+    private var alertHeightConstraint: NSLayoutConstraint!
     
     // MARK: - Init
     
@@ -154,6 +157,8 @@ open class ATTextField: UITextField {
         addBaseLineLayer()
         addAlertLabel()
         stylizeTextField()
+        invalidateIntrinsicContentSize()
+        setNeedsLayout()
     }
     
     // MARK: - Overriding
@@ -178,7 +183,7 @@ open class ATTextField: UITextField {
     
     override open var intrinsicContentSize: CGSize {
         var width: CGFloat = max(headLabel.intrinsicContentSize.width, alertLabel.intrinsicContentSize.width, super.intrinsicContentSize.width)
-        var height: CGFloat = headLabelHeight + textFieldViewHeight + baselineHeight + alertLabelHeight
+        var height: CGFloat = headLabelHeight + textFieldViewHeight + baselineHeight + alertHeight
         height = height + headLabelEdge.top + textViewEdge.top + baseLineEdge.top + alertLabelEdge.top
         width = max(width, 25.0)
         height = max(height, 30.0)
@@ -274,12 +279,15 @@ open class ATTextField: UITextField {
         alertTopConstraint.constant = alertLabelEdge.top
         alertTrailingConstraint.constant = alertLabelEdge.right
         alertBottomConstraint.constant = alertLabelEdge.bottom
-        setNeedsLayout()
+        alertHeightConstraint.constant = alertHeight
+        invalidateIntrinsicContentSize()
+        updateConstraints()
     }
     
     private func addAlertLabel() {
         alertLabel = UILabel()
         alertLabel.alpha = 0.0
+        alertLabel.numberOfLines = 0
         
         alertLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(alertLabel)
@@ -288,7 +296,9 @@ open class ATTextField: UITextField {
         alertTopConstraint = alertLabel.topAnchor.constraint(equalTo: baseLineView.bottomAnchor, constant: alertLabelEdge.top)
         alertTrailingConstraint = trailingAnchor.constraint(equalTo: alertLabel.trailingAnchor, constant: alertLabelEdge.right)
         alertBottomConstraint = alertLabel.bottomAnchor.constraint(greaterThanOrEqualTo: bottomAnchor, constant: alertLabelEdge.bottom)
-        NSLayoutConstraint.activate([alertLeadingConstraint, alertTopConstraint, alertTrailingConstraint, alertBottomConstraint])
+        alertHeightConstraint = alertLabel.heightAnchor.constraint(equalToConstant: alertHeight)
+        print(alertHeight)
+        NSLayoutConstraint.activate([alertLeadingConstraint, alertTopConstraint, alertTrailingConstraint, alertBottomConstraint, alertHeightConstraint])
     }
     
     private func stylizeTextField() {
@@ -447,7 +457,5 @@ open class ATTextField: UITextField {
     private func updateAlertLabelProperties() {
         alertLabel.textColor = alertColor
         alertLabel.text = alertText
-        invalidateIntrinsicContentSize()
-        updateConstraints()
     }
 }
